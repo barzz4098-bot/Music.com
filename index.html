@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Angga</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0b1a;--pan:#1a1530;--pan2:#241d40;--tx:#f4f2fb;--mut:#a59fc0;--pk:#f2557f;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+body{background:radial-gradient(900px 500px at 15% -5%,#2a1f52,transparent),var(--bg);color:var(--tx);font:500 15px/1.4 "Plus Jakarta Sans",system-ui,sans-serif;min-height:100vh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.wrap{max-width:1280px;margin:auto;padding:0 28px 60px}
+header{display:flex;justify-content:space-between;align-items:flex-end;padding:44px 0 28px}
+h1{font-weight:800;font-size:clamp(64px,13vw,120px);line-height:.95;letter-spacing:-.05em;background:linear-gradient(180deg,#fff,#b9b4cf);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cnt{font:500 12px "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.cnt b{color:#fff}
+.main{display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:start}
+.player{position:sticky;top:20px;background:linear-gradient(180deg,var(--pan2),var(--pan));border-radius:28px;padding:22px}
+.player .cv{aspect-ratio:1;border-radius:20px;overflow:hidden;box-shadow:0 20px 50px #0008}
+.player h2{font-size:24px;font-weight:800;margin-top:18px;letter-spacing:-.02em}
+.player .ar{color:var(--mut)}
+.bar{height:5px;background:#ffffff22;border-radius:9px;margin:18px 0 6px;cursor:pointer;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--pk)}
+.tm{display:flex;justify-content:space-between;font:500 11px "JetBrains Mono",monospace;color:var(--mut)}
+.ctl{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px}
+.ctl button{background:#ffffff14;border:0;color:#fff;width:46px;height:46px;border-radius:50%;font-size:16px;cursor:pointer}
+.ctl .pp{width:64px;height:64px;background:var(--pk);font-size:22px}
+.full{display:block;text-align:center;margin-top:16px;color:var(--mut);font-size:13px;text-decoration:none}
+.full:hover{color:#fff}
+.tools{display:flex;gap:12px}
+#q{flex:1;background:var(--pan);border:1px solid #ffffff12;color:#fff;border-radius:16px;padding:16px 20px;font:inherit;outline:none}
+#q:focus{border-color:var(--pk)}
+select{background:var(--pan);border:1px solid #ffffff12;color:#fff;border-radius:16px;padding:0 16px;font:inherit}
+.chips{display:flex;gap:6px;margin:16px 0 22px;overflow-x:auto;padding-bottom:4px}
+.chip{flex:none;background:none;border:0;color:var(--mut);font:inherit;padding:11px 20px;border-radius:99px;cursor:pointer;white-space:nowrap}
+.chip small{font:500 10px "JetBrains Mono",monospace;opacity:.6;margin-left:5px}
+.chip.on{background:#fff;color:#14102a}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:18px}
+.card{cursor:pointer;position:relative}
+.card .cv{aspect-ratio:1;border-radius:18px;overflow:hidden;position:relative;transition:.25s}
+.card:hover .cv{transform:translateY(-4px);box-shadow:0 14px 30px #0009}
+.card.now .cv{outline:3px solid var(--pk)}
+.cv img,.ph{width:100%;height:100%;object-fit:cover;display:block}
+.ph{display:grid;place-items:center;background:linear-gradient(135deg,hsl(var(--h) 60% 38%),hsl(calc(var(--h) + 50) 55% 18%))}
+.ph span{font-size:56px;font-weight:800;opacity:.55}
+.no{position:absolute;left:8px;top:8px;background:#0009;backdrop-filter:blur(6px);font:500 11px "JetBrains Mono",monospace;padding:3px 9px;border-radius:99px}
+.hb{position:absolute;right:8px;top:8px;width:34px;height:34px;border:0;border-radius:50%;background:#0009;backdrop-filter:blur(6px);color:#fff;cursor:pointer;font-size:15px}
+.hb.on{color:var(--pk)}
+.card h3{font-size:15px;font-weight:800;margin-top:10px;letter-spacing:-.01em;overflow-wrap:anywhere}
+.card p{color:var(--mut);font-size:13px}
+.card em{font:500 11px "JetBrains Mono",monospace;font-style:normal;color:#7d77a0}
+.more{display:block;margin:28px auto 0;background:none;border:1px solid #ffffff33;color:#fff;padding:12px 30px;border-radius:99px;font:inherit;cursor:pointer}
+@media(max-width:900px){.main{grid-template-columns:1fr}.player{position:static;display:grid;grid-template-columns:110px 1fr;gap:4px 16px}.player .cv{grid-row:span 4}.player h2{margin-top:0}header{padding-top:28px}.wrap{padding:0 16px 50px}}
+</style>
+</head>
+<body><div class="wrap">
+<header><h1>Angga</h1><div class="cnt"><b id="shown">0</b> / <span id="tot">0</span> lagu · <b id="nf">0</b> favorit</div></header>
+<div class="main">
+ <aside class="player">
+  <div class="cv" id="pcv"></div>
+  <div><h2 id="pt">Pilih lagu</h2><div class="ar" id="pa">Tekan salah satu kartu</div></div>
+  <div><div class="bar" id="bar"><i id="fill"></i></div><div class="tm"><span id="cur">0:00</span><span id="dur">0:30</span></div></div>
+  <div class="ctl"><button id="prev">⏮</button><button class="pp" id="pp">▶</button><button id="next">⏭</button></div>
+  <a class="full" id="full" target="_blank" rel="noopener" href="#">Dengarkan versi full di YouTube ↗</a>
+ </aside>
+ <section>
+  <div class="tools"><input id="q" type="search" placeholder="Cari judul atau artis"><select id="sort"><option value="0">Urutan daftar</option><option value="1">Judul A–Z</option><option value="2">Artis A–Z</option></select></div>
+  <div class="chips" id="chips"></div>
+  <div class="grid" id="grid"></div><button class="more" id="more">Muat lebih banyak</button>
+ </section>
+</div></div>
+<script>
+const V=`Michael Jackson|Billie Jean;Thriller;Beat It;Smooth Criminal;Bad
+Queen|Bohemian Rhapsody;Don't Stop Me Now;We Will Rock You;Somebody to Love
+ABBA|Dancing Queen;Mamma Mia;Gimme! Gimme! Gimme!
+Whitney Houston|I Wanna Dance with Somebody;I Will Always Love You
+Madonna|Like a Prayer;Vogue
+Prince|Purple Rain
+a-ha|Take On Me
+Rick Astley|Never Gonna Give You Up
+Eurythmics|Sweet Dreams
+Journey|Don't Stop Believin'
+Guns N' Roses|Sweet Child O' Mine;November Rain
+Nirvana|Smells Like Teen Spirit
+Oasis|Wonderwall;Don't Look Back in Anger
+Green Day|Basket Case;Boulevard of Broken Dreams
+Linkin Park|In the End;Numb;Faint
+Coldplay|Yellow;Viva la Vida;Fix You;Paradise;A Sky Full of Stars
+Eminem|Lose Yourself;Without Me;The Real Slim Shady
+Britney Spears|...Baby One More Time;Toxic;Oops!... I Did It Again
+Backstreet Boys|I Want It That Way;Everybody
+Westlife|My Love;Flying Without Wings;Uptown Girl
+Celine Dion|My Heart Will Go On
+Shakira|Hips Don't Lie;Waka Waka;Whenever, Wherever
+Beyoncé|Single Ladies;Halo;Crazy in Love
+Rihanna|Umbrella;Diamonds;We Found Love;Work;Only Girl
+Lady Gaga|Bad Romance;Poker Face;Shallow;Just Dance
+Katy Perry|Roar;Firework;Dark Horse;Teenage Dream
+Taylor Swift|Shake It Off;Blank Space;Love Story;Anti-Hero;Cruel Summer;Bad Blood;Style
+Adele|Rolling in the Deep;Someone Like You;Hello;Easy On Me;Set Fire to the Rain
+Ed Sheeran|Shape of You;Perfect;Thinking Out Loud;Photograph;Castle on the Hill;Bad Habits
+Bruno Mars|Uptown Funk;Just the Way You Are;Locked Out of Heaven;Grenade;When I Was Your Man;That's What I Like
+The Weeknd|Blinding Lights;Starboy;Can't Feel My Face;Save Your Tears;Die For You;The Hills
+Dua Lipa|Levitating;Don't Start Now;New Rules;One Kiss;Houdini
+Billie Eilish|Bad Guy;Ocean Eyes;Lovely;What Was I Made For?;Birds of a Feather
+Olivia Rodrigo|Drivers License;Good 4 U;Vampire;Deja Vu
+Harry Styles|As It Was;Watermelon Sugar;Adore You;Sign of the Times
+Justin Bieber|Baby;Sorry;Love Yourself;Peaches;Ghost;Yummy
+Ariana Grande|7 Rings;Thank U, Next;Side to Side;Positions;No Tears Left to Cry
+Sia|Chandelier;Cheap Thrills
+Maroon 5|Sugar;Memories;Girls Like You;This Love;Payphone
+OneRepublic|Counting Stars;Apologize;Secrets;I Ain't Worried
+Imagine Dragons|Believer;Thunder;Demons;Radioactive;Bones
+Twenty One Pilots|Stressed Out;Heathens;Ride
+Post Malone|Circles;Sunflower;Rockstar;Congratulations
+Lewis Capaldi|Someone You Loved;Before You Go
+Sam Smith|Stay With Me;Unholy;Too Good at Goodbyes
+Charlie Puth|Attention;We Don't Talk Anymore;See You Again;One Call Away
+Shawn Mendes|Stitches;Señorita;In My Blood;There's Nothing Holdin' Me Back
+Camila Cabello|Havana;Never Be the Same
+Miley Cyrus|Flowers;Wrecking Ball;Party in the U.S.A.
+Sabrina Carpenter|Espresso;Please Please Please;Nonsense
+Chappell Roan|Pink Pony Club;Good Luck, Babe!;HOT TO GO!
+Gracie Abrams|That's So True
+Tate McRae|Greedy;Exes
+Doja Cat|Say So;Kiss Me More;Woman;Paint the Town Red
+SZA|Kill Bill;Snooze;Good Days
+Lizzo|Good as Hell;About Damn Time
+Lil Nas X|Old Town Road;Montero
+Kendrick Lamar|HUMBLE.;Not Like Us;Alright
+Drake|Hotline Bling;God's Plan;One Dance
+Travis Scott|Sicko Mode;Goosebumps
+Cardi B|Bodak Yellow;WAP
+Psy|Gangnam Style
+Pharrell Williams|Happy
+Luis Fonsi|Despacito
+Bad Bunny|Tití Me Preguntó;Me Porto Bonito;Dákiti
+J Balvin|Mi Gente
+Daddy Yankee|Gasolina
+Enrique Iglesias|Bailando
+Ricky Martin|Livin' la Vida Loca
+Lou Bega|Mambo No. 5
+Los del Río|Macarena
+Eiffel 65|Blue (Da Ba Dee)
+Darude|Sandstorm
+Avicii|Wake Me Up;Levels;Hey Brother
+Calvin Harris|Summer;Feel So Close;This Is What You Came For
+David Guetta|Titanium;Memories
+Alan Walker|Faded;Alone;On My Way
+Marshmello|Happier;Alone
+The Chainsmokers|Closer;Don't Let Me Down;Something Just Like This
+Kygo|Firestone
+Martin Garrix|Animals
+Zedd|Clarity;The Middle
+Major Lazer|Lean On
+Mr. Probz|Waves
+Gotye|Somebody That I Used to Know
+Carly Rae Jepsen|Call Me Maybe
+Kelly Clarkson|Since U Been Gone;Stronger
+Avril Lavigne|Sk8er Boi;Complicated
+Evanescence|Bring Me to Life
+Fall Out Boy|Sugar, We're Goin Down;Centuries
+Paramore|Misery Business;Still into You
+My Chemical Romance|Welcome to the Black Parade
+Panic! At The Disco|High Hopes;I Write Sins Not Tragedies
+Arctic Monkeys|Do I Wanna Know?;505
+The Killers|Mr. Brightside
+Gorillaz|Feel Good Inc.
+The Neighbourhood|Sweater Weather
+Cigarettes After Sex|Apocalypse
+Glass Animals|Heat Waves
+Tame Impala|The Less I Know the Better
+MGMT|Kids
+Foster the People|Pumped Up Kicks
+Lana Del Rey|Summertime Sadness;Young and Beautiful;Video Games
+Lorde|Royals
+Passenger|Let Her Go
+Jason Mraz|I'm Yours
+John Legend|All of Me
+Christina Perri|A Thousand Years
+Ben E. King|Stand by Me
+Eagles|Hotel California
+Led Zeppelin|Stairway to Heaven
+AC/DC|Back in Black;Highway to Hell
+Metallica|Enter Sandman;Nothing Else Matters
+Bon Jovi|Livin' on a Prayer
+Europe|The Final Countdown
+Toto|Africa
+Fleetwood Mac|Dreams;Go Your Own Way
+The Beatles|Hey Jude;Let It Be;Yesterday
+Elvis Presley|Can't Help Falling in Love
+John Lennon|Imagine
+Bob Marley|One Love;Three Little Birds
+Bee Gees|Stayin' Alive
+Earth, Wind & Fire|September
+Boney M.|Rasputin;Daddy Cool
+Village People|Y.M.C.A.
+Survivor|Eye of the Tiger
+Cyndi Lauper|Girls Just Want to Have Fun
+Wham!|Last Christmas
+Mariah Carey|All I Want for Christmas Is You
+Frank Sinatra|Fly Me to the Moon
+Louis Armstrong|What a Wonderful World
+BTS|Dynamite;Butter;Boy With Luv;Spring Day;Fake Love;Permission to Dance
+BLACKPINK|DDU-DU DDU-DU;How You Like That;Kill This Love;Pink Venom;Shut Down;Lovesick Girls
+NewJeans|Hype Boy;Ditto;Super Shy;OMG;Attention
+TWICE|Cheer Up;TT;Fancy;What Is Love?
+Stray Kids|God's Menu;Chk Chk Boom
+aespa|Supernova;Next Level;Spicy
+IVE|Love Dive;After LIKE;I AM
+LE SSERAFIM|ANTIFRAGILE;Unforgiven
+ROSÉ & Bruno Mars|APT.
+ROSÉ|On the Ground
+LISA|Money
+Jungkook|Seven;Standing Next to You
+Red Velvet|Psycho
+EXO|Growl
+BIGBANG|Fantastic Baby
+Girls' Generation|Gee
+Wonder Girls|Nobody
+Tulus|Hati-Hati di Jalan;Monokrom;Pamit;Sewindu
+Hindia|Everything U Are
+Pamungkas|To the Bone
+Mahalini|Sial
+Tiara Andini|Maafkan Aku Terlalu Mencintaimu
+Raisa|Kali Kedua;Jatuh Hati;Could It Be
+Isyana Sarasvati|Tetap dalam Jiwa
+Afgan|Bawa Dia Kembali;Sadis;Panah Asmara
+Dewa 19|Kangen;Pupus;Roman Picisan
+NOAH|Separuh Aku;Tak Lagi Sama
+Peterpan|Bintang di Surga;Mungkin Nanti;Ada Apa Denganmu
+Sheila on 7|Dan;Sebuah Kisah Klasik;Melompat Lebih Tinggi
+Padi|Sang Penghibur;Begitu Indah
+Slank|Terlalu Manis
+GIGI|11 Januari
+Kahitna|Cantik
+Armada|Asal Kau Bahagia
+ST12|Puspa
+Kangen Band|Tentang Bintang
+D'MASIV|Cinta Ini Membunuhku
+Ungu|Cinta dalam Hati
+Nidji|Hapus Aku
+Ayu Ting Ting|Alamat Palsu
+Via Vallen|Sayang
+Denny Caknan|Kartonyono Medot Janji
+Farel Prayoga|Ojo Dibandingke
+Nella Kharisma|Jaran Goyang
+Lesti Kejora|Egois
+Rhoma Irama|Begadang
+Didi Kempot|Cidro;Sewu Kutho
+Chrisye|Gita Cinta
+Koes Plus|Kolam Susu
+Gombloh|Kugadaikan Cintaku
+Judika|Aku yang Tersakiti
+Lyodra|Pesan Terakhir
+Andmesh|Hanya Rindu
+Fiersa Besari|Celengan Rindu
+Juicy Luicy|Lantas
+Nadin Amizah|Bertaut
+Yura Yunita|Cinta dan Rahasia
+Virgoun|Surat Cinta untuk Starla
+Fourtwnty|Zona Nyaman
+HIVI!|Siapkah Kau 'tuk Jatuh Cinta Lagi
+Bondan Prakoso|Ya Sudahlah
+Ebiet G. Ade|Berita kepada Kawan
+Bernadya|Satu Bulan;Kata Mereka Ini Berlebihan
+Weird Genius ft. Sara Fajira|Lathi`,A=`Gurenge|LiSA|Demon Slayer
+Homura|LiSA|Demon Slayer: Mugen Train
+Zankyosanka|Aimer|Demon Slayer
+Idol|YOASOBI|Oshi no Ko
+Yuusha|YOASOBI|Frieren
+Kaibutsu|YOASOBI|Beastars
+Kaikai Kitan|Eve|Jujutsu Kaisen
+Specialz|King Gnu|Jujutsu Kaisen
+Vivid Vice|Who-ya Extended|Jujutsu Kaisen
+Where Our Blue Is|Tatsuya Kitani|Jujutsu Kaisen
+Cry Baby|Official HIGE DANdism|Tokyo Revengers
+Mixed Nuts|Official HIGE DANdism|Spy x Family
+Comedy|Gen Hoshino|Spy x Family
+Unravel|TK from Ling tosite sigure|Tokyo Ghoul
+Abnormalize|Ling tosite sigure|Psycho-Pass
+Again|YUI|Fullmetal Alchemist: Brotherhood
+Period|Chemistry|Fullmetal Alchemist: Brotherhood
+Blue Bird|Ikimono-gakari|Naruto Shippuden
+Silhouette|KANA-BOON|Naruto Shippuden
+Sign|FLOW|Naruto Shippuden
+GO!!!|FLOW|Naruto
+Haruka Kanata|Asian Kung-Fu Generation|Naruto
+Diver|NICO Touches the Walls|Naruto Shippuden
+We Are!|Hiroshi Kitadani|One Piece
+Hikari e|The Babystars|One Piece
+Asterisk|ORANGE RANGE|Bleach
+Ranbu no Melody|SID|Bleach
+Rolling Star|YUI|Bleach
+The World|Nightmare|Death Note
+Alumina|Nightmare|Death Note
+Guren no Yumiya|Linked Horizon|Attack on Titan
+Shinzou wo Sasageyo|Linked Horizon|Attack on Titan
+Jiyuu no Tsubasa|Linked Horizon|Attack on Titan
+My War|Shinsei Kamattechan|Attack on Titan
+The Rumbling|SiM|Attack on Titan
+Crossing Field|LiSA|Sword Art Online
+Innocence|Eir Aoi|Sword Art Online
+Departure!|Masatoshi Ono|Hunter x Hunter
+Hyori Ittai|Yuzu|Hunter x Hunter
+Cha-La Head-Cha-La|Hironobu Kageyama|Dragon Ball Z
+Chozetsu Dynamic!|Kazuya Yoshii|Dragon Ball Super
+Snow Fairy|FUNKIST|Fairy Tail
+Black Catcher|Vickeblanka|Black Clover
+The Day|Porno Graffitti|My Hero Academia
+Peace Sign|Kenshi Yonezu|My Hero Academia
+Heros|Brian the Sun|My Hero Academia
+Polaris|BLUE ENCOUNT|My Hero Academia
+Odd Future|UVERworld|My Hero Academia
+Kick Back|Kenshi Yonezu|Chainsaw Man
+Seishun Complex|Kessoku Band|Bocchi the Rock!
+Good Morning World!|Burnout Syndromes|Dr. Stone
+Fly High!!|Burnout Syndromes|Haikyuu!!
+Imagination|SPYAIR|Haikyuu!!
+Colors|FLOW|Code Geass
+A Cruel Angel's Thesis|Yoko Takahashi|Neon Genesis Evangelion
+Fly Me to the Moon|Claire|Neon Genesis Evangelion
+Tank!|The Seatbelts|Cowboy Bebop
+Hacking to the Gate|Kanako Ito|Steins;Gate
+Hikaru Nara|Goose house|Your Lie in April
+My Soul, Your Beats!|Lia|Angel Beats!
+Dango Daikazoku|Chata|Clannad
+Cagayake! GIRLS|Hokago Tea Time|K-On!
+Redo|Konomi Suzuki|Re:Zero
+Styx Helix|MYTH & ROID|Re:Zero
+Fantastic Dreamer|Machico|KonoSuba
+This Game|Konomi Suzuki|No Game No Life
+99|Mob Choir|Mob Psycho 100
+The Hero!!|JAM Project|One Punch Man
+To the Beginning|Kalafina|Fate/Zero
+Oath Sign|LiSA|Fate/Zero
+Brave Shine|Aimer|Fate/stay night: UBW
+Kizuna no Kiseki|MAN WITH A MISSION|Demon Slayer
+Let Me Hear|Fear, and Loathing in Las Vegas|Parasyte
+Kyouran Hey Kids!!|THE ORAL CIGARETTES|Noragami
+Inferno|Mrs. GREEN APPLE|Fire Force
+Mukanjyo|Survive Said The Prophet|Vinland Saga
+Otonoke|Creepy Nuts|Dandadan
+Bling-Bang-Bang-Born|Creepy Nuts|Mashle
+LEveL|SawanoHiroyuki[nZk]|Solo Leveling
+Sono Chi no Sadame|Hiroaki Tommy Tominaga|JoJo's Bizarre Adventure
+Bloody Stream|Coda|JoJo's Bizarre Adventure
+Hadaka no Yuusha|Vaundy|Ranking of Kings
+Moonlight Densetsu|DALI|Sailor Moon
+Mezase Pokemon Master|Rika Matsumoto|Pokémon
+Butter-Fly|Koji Wada|Digimon Adventure
+Kimi ga Suki da to Sakebitai|BAAD|Slam Dunk
+Deja Vu|Dave Rodgers|Initial D
+Running in the 90s|Max Coveri|Initial D
+I Really Want to Stay at Your House|Rosa Walton|Cyberpunk: Edgerunners
+Hana no Tou|Sayuri|Lycoris Recoil
+Kimi no Shiranai Monogatari|Supercell|Bakemonogatari
+Renai Circulation|Kana Hanazawa|Bakemonogatari
+Hare Hare Yukai|Aya Hirano|Haruhi Suzumiya
+Platinum Disco|Kazuya Yoshii|Dr. Stone
+Silent Voice|Aimer|Tokyo Ghoul:re
+Ichiban no Takaramono|Yui Horie|Fruits Basket
+Uchiage Hanabi|DAOKO x Kenshi Yonezu|Fireworks
+Sparkle|RADWIMPS|Your Name
+Zenzenzense|RADWIMPS|Your Name
+Secret Base|ZONE|Anohana`;
+const $=s=>document.querySelector(s),enc=encodeURIComponent,sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let items=[],fav=new Set(),cache={};
+try{fav=new Set(JSON.parse(localStorage.getItem('angga-fav')||'[]'));cache=JSON.parse(localStorage.getItem('angga-cache')||'{}')}catch(e){}
+V.split('\n').forEach(l=>{const[a,t]=l.split('|');t.split(';').forEach(x=>items.push({t:x,a,g:'viral',sub:'Viral'}))});
+A.split('\n').forEach(l=>{const[t,a,s]=l.split('|');items.push({t,a,g:'anime',sub:s})});
+items.forEach((x,i)=>{x.id=i;x.n=i+1;x.q=x.t+' '+x.a;x.t=x.t.replace(/'/g,'’');x.a=x.a.replace(/'/g,'’')});
+const save=()=>{try{localStorage.setItem('angga-cache',JSON.stringify(cache))}catch(e){}};
+const hue=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%360;return h};
+const cover=x=>{const m=cache[x.id];return m&&m.img?`<img src="${m.img}" alt="">`:`<div class="ph" style="--h:${hue(x.t)}"><span>${x.t[0]}</span></div>`};
+const yt=x=>'https://www.youtube.com/results?search_query='+enc(x.q+' official');
+/* ambil cover + audio dari iTunes (pelan-pelan agar tidak kena limit) */
+const queue=[];let busy=false;
+function want(x,front){if(cache[x.id]||x.p)return;x.p=1;front?queue.unshift(x):queue.push(x);pump()}
+async function pump(){if(busy)return;busy=true;
+ while(queue.length){const x=queue.shift();
+  try{const r=await fetch('https://itunes.apple.com/search?media=music&entity=song&limit=1&term='+enc(x.q));const j=await r.json();const s=j.results&&j.results[0];
+   cache[x.id]=s?{img:s.artworkUrl100.replace('100x100','600x600'),pv:s.previewUrl}:{};save();paint(x);
+  }catch(e){x.p=0;await sleep(5000)}
+  await sleep(1300)}
+ busy=false}
+function paint(x){document.querySelectorAll('[data-c="'+x.id+'"]').forEach(e=>e.innerHTML=cover(x));if(cur===x)$('#pcv').innerHTML=cover(x)}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){want(items[+e.target.dataset.id]);io.unobserve(e.target)}}),{rootMargin:'200px'});
+/* daftar */
+let f='all',q='',lim=48,srt=0,view=[],cur=null;
+function chips(){const c=k=>k==='all'?items.length:k==='fav'?fav.size:items.filter(x=>x.g===k).length;
+ $('#chips').innerHTML=[['all','Semua'],['viral','Viral'],['anime','Anime'],['fav','Favorit']].map(([k,n])=>`<button class="chip ${f===k?'on':''}" data-f="${k}">${n}<small>${c(k)}</small></button>`).join('');
+ $('#tot').textContent=items.length;$('#nf').textContent=fav.size}
+function render(){
+ view=items.filter(x=>(f==='all'||(f==='fav'?fav.has(x.id):x.g===f))&&(x.t+' '+x.a).toLowerCase().includes(q));
+ if(srt==1)view.sort((a,b)=>a.t.localeCompare(b.t));if(srt==2)view.sort((a,b)=>a.a.localeCompare(b.a));
+ $('#grid').innerHTML=view.slice(0,lim).map(x=>`<div class="card ${cur===x?'now':''}" data-id="${x.id}"><div class="cv"><div data-c="${x.id}" style="height:100%">${cover(x)}</div><span class="no">${String(x.n).padStart(3,'0')}</span><button class="hb ${fav.has(x.id)?'on':''}" data-h="${x.id}">${fav.has(x.id)?'♥':'♡'}</button></div><h3>${x.t}</h3><p>${x.a}</p><em>${x.sub}</em></div>`).join('');
+ document.querySelectorAll('.card').forEach(c=>io.observe(c));
+ $('#shown').textContent=view.length;$('#more').style.display=view.length>lim?'block':'none';chips()}
+/* pemutar */
+const au=new Audio();au.preload='none';
+const mm=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+async function play(x){cur=x;$('#pt').textContent=x.t;$('#pa').textContent=x.a;$('#pcv').innerHTML=cover(x);$('#full').href=yt(x);
+ document.querySelectorAll('.card').forEach(c=>c.classList.toggle('now',+c.dataset.id===x.id));
+ $('#pp').textContent='…';
+ if(!cache[x.id]){want(x,true);for(let i=0;i<40&&!cache[x.id]&&x.p;i++)await sleep(250)}
+ if(cur!==x)return;
+ const m=cache[x.id];
+ if(m&&m.pv){au.src=m.pv;try{await au.play()}catch(e){}}else{$('#pp').textContent='▶';$('#pa').textContent=x.a+' · preview tidak tersedia, pakai tombol YouTube'}}
+const step=d=>{if(!view.length)return;const i=view.indexOf(cur);play(view[(i+d+view.length)%view.length])};
+au.onplay=()=>$('#pp').textContent='❚❚';au.onpause=()=>$('#pp').textContent='▶';au.onended=()=>step(1);
+au.ontimeupdate=()=>{$('#fill').style.width=(au.currentTime/(au.duration||30)*100)+'%';$('#cur').textContent=mm(au.currentTime);$('#dur').textContent=mm(au.duration||30)};
+$('#pp').onclick=()=>cur?(au.paused?au.play():au.pause()):view[0]&&play(view[0]);
+$('#prev').onclick=()=>step(-1);$('#next').onclick=()=>step(1);
+$('#bar').onclick=e=>{if(au.duration)au.currentTime=e.offsetX/e.currentTarget.clientWidth*au.duration};
+/* event */
+$('#q').oninput=e=>{q=e.target.value.toLowerCase();lim=48;render()};
+$('#sort').onchange=e=>{srt=+e.target.value;render()};
+$('#more').onclick=()=>{lim+=48;render()};
+$('#chips').onclick=e=>{const b=e.target.closest('.chip');if(b){f=b.dataset.f;lim=48;render()}};
+$('#grid').onclick=e=>{const h=e.target.closest('.hb');
+ if(h){const id=+h.dataset.h;fav.has(id)?fav.delete(id):fav.add(id);try{localStorage.setItem('angga-fav',JSON.stringify([...fav]))}catch(_){}
+  h.classList.toggle('on');h.textContent=fav.has(id)?'♥':'♡';chips();return}
+ const c=e.target.closest('.card');if(c)play(items[+c.dataset.id])};
+render();
+</script>
+</body>
+</html>
